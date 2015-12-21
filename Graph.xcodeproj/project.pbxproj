@@ -62,6 +62,7 @@
 		E66630DA1BE9185F0031F523 /* GraphingCalculator */ = {
 			isa = PBXGroup;
 			children = (
+				E66630E41BE9185F0031F523 /* LaunchScreen.storyboard */,
 				E66630DF1BE9185F0031F523 /* Main.storyboard */,
 				E69B5D641BE9446A00A4AFE3 /* Models */,
 				E69B5D631BE9445300A4AFE3 /* Controllers */,
@@ -78,7 +79,6 @@
 				E66630DB1BE9185F0031F523 /* AppDelegate.swift */,
 				E66630F01BE91BF40031F523 /* AxesDrawer.swift */,
 				E66630E21BE9185F0031F523 /* Assets.xcassets */,
-				E66630E41BE9185F0031F523 /* LaunchScreen.storyboard */,
 				E66630E71BE9185F0031F523 /* Info.plist */,
 			);
 			name = Supporting;

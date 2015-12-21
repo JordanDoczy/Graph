@@ -109,7 +109,7 @@ class GraphView : UIView {
         
         let animation = CABasicAnimation(keyPath: "strokeEnd")
         animation.timingFunction = CAMediaTimingFunction(name: kCAMediaTimingFunctionEaseOut)
-        animation.duration = 4.4
+        animation.duration = 2.8
         animation.fromValue = 0
         animation.toValue = 1
 

@@ -22,7 +22,7 @@ class GraphViewController: UIViewController, GraphViewDataSource {
             graphView.addGestureRecognizer(tapGestureRecognizer)
             graphView.addGestureRecognizer(UIPinchGestureRecognizer(target: graphView, action:Selector(GraphView.GestureRecognizer.Scale+":")))
             graphView.addGestureRecognizer(UIPanGestureRecognizer(target: graphView, action:Selector(GraphView.GestureRecognizer.Pan+":")))
-            graphView.contentMode = .Redraw
+            graphView.contentMode = .redraw
         }
     }
     
@@ -30,7 +30,7 @@ class GraphViewController: UIViewController, GraphViewDataSource {
         super.viewDidLoad()
     }
         
-    func yForX(x:CGFloat) -> CGFloat? {
+    func yForX(_ x:CGFloat) -> CGFloat? {
         return dataSource?.yForX(x)
     }
     

@@ -25,7 +25,7 @@ class CalculatorBrain{
         }
         
         
-        return operations.reverse().joinWithSeparator(",")
+        return operations.reversed().joined(separator: ",")
     }
     
     struct Variables {
@@ -47,28 +47,28 @@ class CalculatorBrain{
     }
     
     init(){
-        func addOp(let op:Op){
+        func addOp(_ op:Op){
             knownOps[op.description] = op
         }
         
-        addOp(Op.BinaryOperation(Variables.Multiply, *))
-        addOp(Op.BinaryOperation(Variables.Divide, { $1 / $0 }))
-        addOp(Op.BinaryOperation(Variables.Add, +))
-        addOp(Op.BinaryOperation(Variables.Subtract, { $1 - $0 }))
-        addOp(Op.UnaryOperation(Variables.SquareRoot, sqrt))
-        addOp(Op.UnaryOperation(Variables.Sin, sin))
-        addOp(Op.UnaryOperation(Variables.Cos, cos))
-        addOp(Op.OperandSymbol(Variables.Pi, Double(M_PI)))
+        addOp(Op.binaryOperation(Variables.Multiply, *))
+        addOp(Op.binaryOperation(Variables.Divide, { $1 / $0 }))
+        addOp(Op.binaryOperation(Variables.Add, +))
+        addOp(Op.binaryOperation(Variables.Subtract, { $1 - $0 }))
+        addOp(Op.unaryOperation(Variables.SquareRoot, sqrt))
+        addOp(Op.unaryOperation(Variables.Sin, sin))
+        addOp(Op.unaryOperation(Variables.Cos, cos))
+        addOp(Op.operandSymbol(Variables.Pi, .pi))
     }
 
-    func reset(variables variables: Bool = true) {
+    func reset(variables: Bool = true) {
         opStack.removeAll()
         if variables {
-            variableValues.removeValueForKey(Variables.X)
+            variableValues.removeValue(forKey: Variables.X)
         }
     }
     
-    func performOperation(symbol:String) -> Double?{
+    func performOperation(_ symbol:String) -> Double?{
         if let operation = knownOps[symbol] {
             opStack.append(operation)
         }
@@ -76,62 +76,62 @@ class CalculatorBrain{
     }
 
     
-    func pushOperand(symbol: String) -> Double?{
+    func pushOperand(_ symbol: String) -> Double?{
         if let operand = variableValues[symbol] {
-            opStack.append(Op.OperandSymbol(symbol, operand))
+            opStack.append(Op.operandSymbol(symbol, operand))
         } else {
-            opStack.append(Op.OperandSymbol(symbol, nil))
+            opStack.append(Op.operandSymbol(symbol, nil))
         }
         return evaluate()
     }
     
-    func pushOperand(operand: Double) -> Double?{
-        opStack.append(Op.Operand(operand))
+    func pushOperand(_ operand: Double) -> Double?{
+        opStack.append(Op.operand(operand))
         return evaluate()
     }
     
    
-    private var knownOps = [String:Op]()
-    private var opStack = [Op]()
+    fileprivate var knownOps = [String:Op]()
+    fileprivate var opStack = [Op]()
 
-    private enum Op: CustomStringConvertible{
-        case Operand(Double)
-        case OperandSymbol(String, Double?)
-        case UnaryOperation(String, Double -> Double)
-        case BinaryOperation(String, (Double,Double) -> Double)
+    fileprivate enum Op: CustomStringConvertible{
+        case operand(Double)
+        case operandSymbol(String, Double?)
+        case unaryOperation(String, (Double) -> Double)
+        case binaryOperation(String, (Double,Double) -> Double)
         
         var description:String{
             get{
                 switch self{
-                    case .Operand(let operand): return "\(operand)"
-                    case .OperandSymbol(let symbol, _): return symbol
-                    case .UnaryOperation(let symbol, _): return symbol
-                    case .BinaryOperation(let symbol, _): return symbol
+                    case .operand(let operand): return "\(operand)"
+                    case .operandSymbol(let symbol, _): return symbol
+                    case .unaryOperation(let symbol, _): return symbol
+                    case .binaryOperation(let symbol, _): return symbol
                 }
             }
         }
     }
     
-    private func evaluate(ops:[Op]) -> (result:Double?, remainingOps:[Op]){
+    fileprivate func evaluate(_ ops:[Op]) -> (result:Double?, remainingOps:[Op]){
         if !ops.isEmpty{
             var remainingOps = ops
             let op = remainingOps.removeLast()
             switch op{
-            case .Operand(let operand):
+            case .operand(let operand):
                 return (operand, remainingOps)
-            case .OperandSymbol(let symbol, let value):
+            case .operandSymbol(let symbol, let value):
                 if value == nil {
                     if let myVal = variableValues[symbol] {
                         return (myVal, remainingOps)
                     }
                 }
                 return (value, remainingOps)
-            case .UnaryOperation(_, let operation):
+            case .unaryOperation(_, let operation):
                 let operandEvaluation = evaluate(remainingOps)
                 if let operand = operandEvaluation.result {
                     return (operation(operand), operandEvaluation.remainingOps)
                 }
-            case .BinaryOperation(_, let operation):
+            case .binaryOperation(_, let operation):
                 let op1Evaluation = evaluate(remainingOps)
                 if let operand1 = op1Evaluation.result {
                     let op2Evaluation = evaluate(op1Evaluation.remainingOps)
@@ -145,20 +145,20 @@ class CalculatorBrain{
     }
     
     
-    private func getDescription(ops:[Op], previousSymbol:String? = nil) -> (result:String?, remainingOps:[Op]){
+    fileprivate func getDescription(_ ops:[Op], previousSymbol:String? = nil) -> (result:String?, remainingOps:[Op]){
         if !ops.isEmpty{
             var remainingOps = ops
             let op = remainingOps.removeLast()
             switch op{
-            case .Operand(let operand):
+            case .operand(let operand):
                 return ("\(operand)", remainingOps)
-            case .OperandSymbol(let symbol, _):
+            case .operandSymbol(let symbol, _):
                 return (symbol, remainingOps)
-            case .UnaryOperation(let symbol, _):
+            case .unaryOperation(let symbol, _):
                 let operandEvaluation = getDescription(remainingOps)
                 let operand = operandEvaluation.result ==  nil ? "?" : "\(operandEvaluation.result!)"
                 return (symbol + "(" + operand + ")", operandEvaluation.remainingOps)
-            case .BinaryOperation(let symbol, _):
+            case .binaryOperation(let symbol, _):
                 let op1Evaluation = getDescription(remainingOps, previousSymbol: symbol)
                 let operand1 = op1Evaluation.result ==  nil ? "?" : "\(op1Evaluation.result!)"
                 let op2Evaluation = getDescription(op1Evaluation.remainingOps)

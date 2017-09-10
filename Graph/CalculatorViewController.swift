@@ -13,9 +13,9 @@ class CalculatorViewController: UIViewController, GraphViewDataSource {
     @IBOutlet weak var display: UILabel!
     @IBOutlet weak var operationLabel: UILabel!
     
-    private var isUserTyping = false
-    private var model = CalculatorBrain()
-    private var spacer:CGFloat = 10.0
+    fileprivate var isUserTyping = false
+    fileprivate var model = CalculatorBrain()
+    fileprivate var spacer:CGFloat = 10.0
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -25,26 +25,26 @@ class CalculatorViewController: UIViewController, GraphViewDataSource {
         super.didReceiveMemoryWarning()
     }
     
-    override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
+    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         
-        var destination = segue.destinationViewController
+        var destination = segue.destination
         if let navController = destination as? UINavigationController {
             destination = navController.visibleViewController!
         }
         
         if let controller = destination as? GraphViewController {
-            controller.title = model.description.componentsSeparatedByString(",").last
+            controller.title = model.description.components(separatedBy: ",").last
             controller.dataSource = self
         }
     }
     
     
     // (handles all digits and decimal point)
-    @IBAction func appendDigit(sender: UIButton) {
+    @IBAction func appendDigit(_ sender: UIButton) {
         let digit = sender.currentTitle!
         
         if isUserTyping {
-            if digit != "." || !display.text!.containsString(".") {
+            if digit != "." || !display.text!.contains(".") {
                 display.text = display.text! + digit
             }
         } else {
@@ -53,7 +53,7 @@ class CalculatorViewController: UIViewController, GraphViewDataSource {
         }
     }
     
-    @IBAction func appendVariable(sender: UIButton) {
+    @IBAction func appendVariable(_ sender: UIButton) {
         if let result = model.pushOperand(sender.currentTitle!) {
             displayValue = result
         } else {
@@ -62,7 +62,7 @@ class CalculatorViewController: UIViewController, GraphViewDataSource {
     }
     
     // clears the model, displayValue, and history
-    @IBAction func clear(sender: UIButton) {
+    @IBAction func clear(_ sender: UIButton) {
         model.reset()
         displayValue = nil
         isUserTyping = false
@@ -82,7 +82,7 @@ class CalculatorViewController: UIViewController, GraphViewDataSource {
     }
     
     // handles ×,÷,+,−,√,sin,cos,pi
-    @IBAction func operate(sender: UIButton) {
+    @IBAction func operate(_ sender: UIButton) {
         if isUserTyping {
             enter()
         }
@@ -95,7 +95,7 @@ class CalculatorViewController: UIViewController, GraphViewDataSource {
     }
     
     // sets a var on the model
-    @IBAction func setVarialbe(sender: UIButton) {
+    @IBAction func setVarialbe(_ sender: UIButton) {
         model.variableValues[CalculatorBrain.Variables.X] = displayValue
         isUserTyping = false
         displayValue = model.evaluate()
@@ -105,7 +105,7 @@ class CalculatorViewController: UIViewController, GraphViewDataSource {
     var displayValue: Double? {
         get {
             if display.text == nil { return nil }
-            if let value = NSNumberFormatter().numberFromString(display.text!)?.doubleValue{
+            if let value = NumberFormatter().number(from: display.text!)?.doubleValue{
                 return value
             }
             return nil
@@ -127,7 +127,7 @@ class CalculatorViewController: UIViewController, GraphViewDataSource {
         }
     }
     
-    func yForX(x:CGFloat) -> CGFloat? {
+    func yForX(_ x:CGFloat) -> CGFloat? {
         var value:CGFloat? = nil
         let m = model.variableValues[CalculatorBrain.Variables.X]
         model.variableValues[CalculatorBrain.Variables.X] = Double(x)

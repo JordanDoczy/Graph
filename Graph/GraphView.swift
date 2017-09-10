@@ -14,7 +14,7 @@ import QuartzCore
 import SpriteKit
 
 protocol GraphViewDataSource: class{
-    func yForX(x:CGFloat) -> CGFloat?
+    func yForX(_ x:CGFloat) -> CGFloat?
 }
 
 @IBDesignable
@@ -27,7 +27,7 @@ class GraphView : UIView {
     }
     
     
-    private var axis = AxesDrawer(color: UIColor.darkGrayColor())
+    fileprivate var axis = AxesDrawer(color: UIColor.darkGray)
     weak var dataSource:GraphViewDataSource?
 
     @IBInspectable
@@ -46,18 +46,18 @@ class GraphView : UIView {
         origin = CGPoint(x: bounds.width/2, y: bounds.height/2)
     }
     
-    func pan(gesture: UIPanGestureRecognizer){
-        if gesture.state == .Changed{
-            let translation = gesture.translationInView(self)
+    func pan(_ gesture: UIPanGestureRecognizer){
+        if gesture.state == .changed{
+            let translation = gesture.translation(in: self)
             if origin != nil {
                 origin = CGPoint(x: origin!.x + translation.x, y: origin!.y + translation.y)
             }
-            gesture.setTranslation(CGPointZero, inView: self)
+            gesture.setTranslation(CGPoint.zero, in: self)
         }
     }
     
-    func scale(gesture: UIPinchGestureRecognizer){
-        if gesture.state == .Changed{
+    func scale(_ gesture: UIPinchGestureRecognizer){
+        if gesture.state == .changed{
             scale /= gesture.scale
             gesture.scale = 1
         }
@@ -78,8 +78,8 @@ class GraphView : UIView {
             point.x = CGFloat(position)
             if let y = getYForX(point.x){
                 point.y = y
-                path.addLineToPoint(point)
-                path.moveToPoint(point)
+                path.addLine(to: point)
+                path.move(to: point)
             }
         }
     }
@@ -87,7 +87,7 @@ class GraphView : UIView {
     let shapeLayer = CAShapeLayer()
 
 
-    override func drawRect(rect: CGRect) {
+    override func draw(_ rect: CGRect) {
 
         shapeLayer.removeFromSuperlayer()
         path.removeAllPoints()
@@ -101,7 +101,7 @@ class GraphView : UIView {
         
         point.x = x
         point.y = y
-        path.moveToPoint(point)
+        path.move(to: point)
 
         for x in 0...Int(bounds.width) {
             position = CGFloat(x)
@@ -113,19 +113,19 @@ class GraphView : UIView {
         animation.fromValue = 0
         animation.toValue = 1
 
-        shapeLayer.addAnimation(animation, forKey: "strokeEndAnimation")
+        shapeLayer.add(animation, forKey: "strokeEndAnimation")
         shapeLayer.lineWidth = 1
-        shapeLayer.strokeColor = UIColor.darkGrayColor().CGColor
+        shapeLayer.strokeColor = UIColor.darkGray.cgColor
         shapeLayer.strokeStart = 0
         shapeLayer.strokeEnd = 1
-        shapeLayer.path = path.CGPath
+        shapeLayer.path = path.cgPath
 
         layer.addSublayer(shapeLayer)
        
         
     }
     
-    private func getYForX(x:CGFloat) -> CGFloat?{
+    fileprivate func getYForX(_ x:CGFloat) -> CGFloat?{
         
         if let y = dataSource?.yForX((x-origin!.x)/scale) {
             if y.isNormal || y.isZero {
@@ -136,10 +136,10 @@ class GraphView : UIView {
     }
     
     
-    private func getPath(start start:CGPoint,end:CGPoint) -> UIBezierPath {
+    fileprivate func getPath(start:CGPoint,end:CGPoint) -> UIBezierPath {
         let path = UIBezierPath()
-        path.moveToPoint(start)
-        path.addLineToPoint(end)
+        path.move(to: start)
+        path.addLine(to: end)
         path.lineWidth = 1.0
         return path
     }
